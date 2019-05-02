@@ -1,6 +1,8 @@
 # Quadrant-Slope-Index-QSI
 The R Script for automating the calculations and graphing for the QSI algorithm. 
 
+Note: These instructions are best viewed in a plain text reader.
+
 ### Start of ReadMe Info
 
                  ###### Quadrant Slope Index (QSI) Algorithm #####
