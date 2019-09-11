@@ -1,4 +1,5 @@
 # By David H. Nguyen, PhD (www.TSG-Lab.org)
+# Updated 9/05/19. Modified lines 20 and 242 to define "positive" angles to include 0 degrees (as in >=0 and <=90). 
 
 
 ### Start of ReadMe Info
@@ -16,7 +17,7 @@
 #     * "sample_input_negative_slopes.csv"
 # 3. For simplicity, I decided to require that you sort and separate the 
 #     positive and negatives slopes into two different files before you run this script. 
-#       * Slopes between 0 and >=90 degrees are considered positive. 
+#       * Slopes >=0 and >=90 degrees are considered positive. 
 #       * Slopes between 90 and >= 180 are considered negative.
 #     Your two files should contain at least three columns each:  
 #       the x coordinate, the y coordinate, and the slope. 
@@ -238,7 +239,7 @@ colnames(the.data)[colnames(the.data)=="FeretAngle"] <- "angle"
 #View(the.data)
 
 # Angles between 0 and 90 (including 90) are "positive"
-wanted = filter(the.data, angle > 0, angle <= 90)
+wanted = filter(the.data, angle >= 0, angle <= 90)
 slope = select(wanted, xcoord, ycoord, angle)
 #View(slope)
 
