@@ -1,5 +1,5 @@
 # By David H. Nguyen, PhD (www.TSG-Lab.org)
-# Updated 9/05/19. Modified lines 20 and 242 to define "positive" angles to include 0 degrees (as in >=0 and <=90). 
+# Updated 2/8/20 
 
 
 ### Start of ReadMe Info
@@ -94,7 +94,6 @@ the.data2 = read.csv("sample_input_negative_slopes.csv")
 #View(the.data2)
 
 
-
 #############################
 #############################
 #############################
@@ -146,7 +145,6 @@ for (i in x.lows){ #This inadvertantly removes the first item of x.lows, which i
 }
 
 x.lows.final = c(0, counter) # add a zero back to start of the vector
-x.lows.final
 
 x.upps = x.units[2:length(x.units)]
 
@@ -379,6 +377,7 @@ oohlala = as.data.frame(oohlala)
 # Section 7 - Isolating 
 
 
+
 # Section 7a - Prep the data for subsequent sections. 
 
 # This line creates a new column called sum.posNneg, which contains 
@@ -412,11 +411,11 @@ pe0.ngt1 = filter(oohlala, pos.slopes==0, neg.slopes>1)
 #View(pe0.ngt1)
 
 ####
+pe0.ngt1$converted.pos.slopes = NULL # delete column called 'converted.pos.slopes'
 minus.ones = rep(-1, times = dim(pe0.ngt1)[1]) # create a vector of repeating -1
-pe0.ngt1$converted.pos.slopes = NULL
 pe0.ngt1 = cbind(pe0.ngt1, minus.ones)
 pe0.ngt1 = rename(pe0.ngt1, converted.pos.slopes = minus.ones) # Rename minus.one to coverted.pos.slopes
-pe0.ngt1 = pe0.ngt1[, c(1,2,3,4,5,6,8,7)] # This switches order of last to columns to match initial ordering
+pe0.ngt1 = pe0.ngt1[, c(1,2,3,4,5,6,8,7)] # This switches order of last two columns to match initial ordering
 pe0.ngt1 = mutate(pe0.ngt1, converted.PosOverNeg = converted.pos.slopes*converted.neg.slopes)
 
 
@@ -435,12 +434,11 @@ pe0.ne1 = filter(oohlala, pos.slopes==0, neg.slopes==1)
 
 
 ######
-pe0.ne1 = pe0.ne1[, -c(7,8,9)] # Remove the last three columns
-
+pe0.ne1$converted.pos.slopes = NULL # delete column called 'converted.pos.slopes'
 minus.ones.2 = rep(-1, times = dim(pe0.ne1)[1]) # create a vector of repeating -1
-pe0.ne1 = cbind(pe0.ne1, minus.ones.2)
+pe0.ne1 = cbind(pe0.ne1, minus.ones.2) # add minus.ones.2 as new column 
 pe0.ne1 = rename(pe0.ne1, converted.pos.slopes = minus.ones.2) # Rename minus.one to coverted.pos.slopes
-pe0.ne1 = mutate(pe0.ne1, converted.neg.slopes = neg.slopes)
+pe0.ne1 = pe0.ne1[, c(1,2,3,4,5,6,8,7)] # This switches order of last two columns to match initial ordering
 pe0.ne1 = mutate(pe0.ne1, converted.PosOverNeg = converted.pos.slopes*converted.neg.slopes)
 
 
@@ -458,16 +456,12 @@ pe0.ne1 = mutate(pe0.ne1, converted.PosOverNeg = converted.pos.slopes*converted.
 pe1.ne0 = filter(oohlala, pos.slopes==1, neg.slopes==0)
 #View(pe1.ne0)
 
-pe1.ne0 = pe1.ne0[, -c(7,8)] # Remove the last three columns
+pe1.ne0$converted.neg.slopes = NULL # delete column called 'converted.NEG.slopes'
 
 ones = rep(1, times = dim(pe1.ne0)[1]) # create a vector of repeating 1
 pe1.ne0 = cbind(pe1.ne0, ones)
-pe1.ne0 = rename(pe1.ne0, converted.neg.slopes = ones) # Rename ones to coverted.pos.slopes
-pe1.ne0 = mutate(pe1.ne0, converted.pos.slopes = pos.slopes) # Duplate pos.slopes and rename it converted.pos.slopes
-pe1.ne0 = pe1.ne0[, c(1,2,3,4,5,6,8,7)]
+pe1.ne0 = rename(pe1.ne0, converted.neg.slopes = ones) # Rename ones to coverted.neg.slopes
 pe1.ne0 = mutate(pe1.ne0, converted.PosOverNeg = converted.pos.slopes*converted.neg.slopes)
-
-
 
 
 
@@ -479,33 +473,36 @@ pe1.ne0 = mutate(pe1.ne0, converted.PosOverNeg = converted.pos.slopes*converted.
 #     units that have many positive slopes but are "undefined" because 0 in denominator.  
 #     But, 2/1=2, and 8/1=8, so 2 and 8 are more informative than "undefined".
 
-# This filters all rows in which pos.slopes > 0 and neg.slopes = 0, 
+# This filters all rows in which pos.slopes > 1 (not >0 because Step 7d caught those) and neg.slopes = 0, 
 #   which would result in "NA" b/c you can't divide by 0
-pgt0.ne0 = filter(oohlala, pos.slopes>0, neg.slopes==0)
+pgt1.ne0 = filter(oohlala, pos.slopes>1, neg.slopes==0)
 #View(pgt0.ne0)
 
-pgt0.ne0 = pgt0.ne0[, -c(7,8)] # Remove the last three columns
+pgt1.ne0$converted.neg.slopes = NULL # delete column called 'converted.neg.slopes'
 
-ones = rep(1, times = dim(pgt0.ne0)[1]) # create a vector of repeating 1
-pgt0.ne0 = cbind(pgt0.ne0, ones)
-pgt0.ne0 = rename(pgt0.ne0, converted.neg.slopes = ones) # Rename ones to coverted.pos.slopes
-pgt0.ne0 = mutate(pgt0.ne0, converted.pos.slopes = pos.slopes) # Duplate pos.slopes and rename it converted.pos.slopes
-pgt0.ne0 = pgt0.ne0[, c(1,2,3,4,5,6,8,7)]
-pgt0.ne0 = mutate(pgt0.ne0, converted.PosOverNeg = converted.pos.slopes/converted.neg.slopes)
+
+ones = rep(1, times = dim(pgt1.ne0)[1]) # create a vector of repeating 1
+pgt1.ne0 = cbind(pgt1.ne0, ones)
+pgt1.ne0 = rename(pgt1.ne0, converted.neg.slopes = ones) # Rename ones to coverted.pos.slopes
+pgt1.ne0 = mutate(pgt1.ne0, converted.PosOverNeg = converted.pos.slopes/converted.neg.slopes)
 
 
 ####################
 # Section 7f - Combine results and Save the data as a .csv file
 
-voila = rbind(pe0.ngt1, pe0.ne1, pe1.ne0, pgt0.ne0)
+
+voila = rbind(pe0.ngt1, pe0.ne1, pe1.ne0, pgt1.ne0)
 #View(voila)
 
-# Create dataframe containing all items in oohlala except for the rows contained in voila
+# Remove the items in voila from the oohlala
 toDrop.voila = voila$permanent.rowNumb # list of what rows to remove
-remaining = oohlala[ !(rownames(oohlala) %in% toDrop.voila), ] # remove the rows
-remaining = mutate(remaining, converted.PosOverNeg = converted.pos.slopes/converted.neg.slopes)
+cut.from.oohlala = oohlala[ !oohlala$permanent.rowNumb %in% toDrop.voila, ] # does the removing from oohlala
+
+# For what is in cut.from.oohlala, divide the do 'converted.pos.slopes/converted.neg.slopes'
+remaining = mutate(cut.from.oohlala, converted.PosOverNeg = converted.pos.slopes/converted.neg.slopes)
 #View(remaining)
 
+# Create the final QSI data frame that will be exported
 shabbam = rbind(voila, remaining)
 shabbam = arrange(shabbam, permanent.rowNumb)
 #View(shabbam)
@@ -548,21 +545,19 @@ percent_pe1.ne0 = round(num.pe1.ne0/total.gridunits, 3)
 
 #####
 # Calculate percentage of total for category: positive/negative = (N>1)/0
-num.pgt0.ne0 = dim(pgt0.ne0)[1]
-percent_pgt0.ne0 = round(num.pgt0.ne0/total.gridunits, 3)
-
+num.pgt1.ne0 = dim(pgt1.ne0)[1]
+percent_pgt1.ne0 = round(num.pgt1.ne0/total.gridunits, 3)
 
 
 ##################
 
 # Section 8b - Print the descriptive statistics and how to interpret them.
 
-gather = list( "Category 1 - # of 0/(N>1)" = num.pe0.ngt1, "Category 1 - % is 0/(N>1)" = percent_pe0.ngt1, "Category 2 - # of (N>1)/0" = num.pgt0.ne0, "Category 2 - % is (N>1)/0" = percent_pgt0.ne0, 
+gather = list( "Category 1 - # of 0/(N>1)" = num.pe0.ngt1, "Category 1 - % is 0/(N>1)" = percent_pe0.ngt1, "Category 2 - # of (N>1)/0" = num.pgt1.ne0, "Category 2 - % is (N>1)/0" = percent_pgt1.ne0, 
               "Category 3 - # of 0/1" = num.pe0.ne1, "Category 3 - % is 0/1" = percent_pe0.ne1, "Category 4 - # of 1/0" = num.pe1.ne0, "Category 4 - % is 1/0" = percent_pe1.ne0)
 
 
 export.me = as.matrix(gather)
-export.me
 
 write.csv(export.me, "descriptive stats QSI.csv")
 
@@ -574,7 +569,7 @@ write.csv(export.me, "descriptive stats QSI.csv")
 ##############################
 ##############################
 
-# Section X
+# Section 9
 # Plot the Dot Plot!
 
 # Plot the data as a dot plot, such that each grid unit is a large square instead of a small dot.
@@ -587,4 +582,5 @@ ggplot(shabbam, aes(x=x.location, y=y.location, color=converted.PosOverNeg)) +
 
 
 print("This script is finished running. Save the image of the graph. This is just a dot plot of uniformly spaced dots that are very large squares.")
+
 
